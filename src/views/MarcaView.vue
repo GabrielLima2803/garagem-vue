@@ -1,57 +1,58 @@
 <script setup>
 import { ref, reactive, onMounted } from "vue";
-import CoresApi from "@/api/cores";
-const coresApi = new CoresApi();
+import MarcaApi from "@/api/marcas";
+const marcaApi = new MarcaApi();
 
-const defaultCor = { id: null, nome: ""};
-const cores = ref([]);
-const cor = reactive({ ...defaultCor });
+const defaultMarca = { id: null, nome: "", nacionalidade: "" || null};
+const marcas = ref([]);
+const marca = reactive({ ...defaultMarca });
 
 onMounted(async () => {
-  cores.value = await coresApi.buscarTodasAsCores();
-  console.log(cores.value)
+  marcas.value = await marcaApi.buscarTodasAsMarca();
+  console.log(marcas.value)
 });
 
 function limpar() {
-  Object.assign(cor, { ...defaultCor });
+  Object.assign(marca, { ...defaultMarca });
 }
 
 async function salvar() {
-  if (cor.id) {
-    await coresApi.atualizarCores(cor);
+  if (marca.id) {
+    await marcaApi.atualizarMarca(marca);
   } else {
-    await coresApi.adicionarCores(cor);
+    await marcaApi.adicionarMarca(marca);
   }
-  cores.value = await coresApi.buscarTodasAsCores();
+  marcas.value = await marcaApi.buscarTodasAsMarca();
   limpar();
 }
 
-function editar(cor_para_editar) {
-  Object.assign(cor, cor_para_editar);
+function editar(marca_para_editar) {
+  Object.assign(marca, marca_para_editar);
 }
 
 async function excluir(id) {
-  await coresApi.excluirCor(id);
-  cores.value = await coresApi.buscarTodasAsCores();
+  await marcaApi.excluirMarca(id);
+  marcas.value = await marcaApi.buscarTodasAsMarca();
   limpar();
 }
 </script>
 
 <template>
-  <h1>Cor</h1>
+  <h1>marca</h1>
   <hr />
   <div class="form">
-    <input type="text" v-model="cor.nome" placeholder="Nome" />
+    <input type="text" v-model="marca.nome" placeholder="Nome" />
+    <input type="text" v-model="marca.nacionalidade" placeholder="Nome" />
     <button @click="salvar" class="gap">Salvar</button>
     <button @click="limpar">Limpar</button>
   </div>
   <hr />
   <ul>
-      <li v-for="cor in cores" :key="cor.id">
-        <span @click="editar(cor)">
-        ({{ cor.id }}) - {{ cor.nome }}
+      <li v-for="marca in marcas" :key="marca.id">
+        <span @click="editar(marca)">
+        ({{ marca.id }}) - {{ marca.nome }} - {{ marca.nacionalidade }}
       </span>
-      <button @click="excluir(cor.id)">X</button>
+      <button @click="excluir(marca.id)">X</button>
     </li>
   </ul>
 </template>
@@ -61,6 +62,11 @@ async function excluir(id) {
     margin-right: 10px;
     margin-left: 10px
 }
+.gap{
+    margin-right: 10px;
+    margin-left: 10px
+}
+
 
 .form {
   margin-bottom: 20px;
@@ -134,5 +140,4 @@ li button {
 li button:hover {
   background-color: #c82333;
 }
-
 </style>
